@@ -18,7 +18,7 @@ HF = 203
 f = Fig(HF)
 R = f.fig.canvas.get_renderer()
 K = '#222222'
-C_VLM, C_AE, C_REF = '#fdf0c0', '#fcd9b8', '#fef0e2'
+C_VLM, C_AE, C_REF = '#f3f4f6', '#fbe3cb', '#fdf4ea'
 FS_B = 7.8
 
 
@@ -75,7 +75,7 @@ arr([(xm, yc + 4.2), (xm, yc + 36), (21, yc + 36), (21, yc + 20.6)])
 T(111, yc + 43, 'first 5 actions executed, then a new observation', size=7.0, ha='center')
 
 # =================================================================== b: recording
-LANE = '#eef1f4'; TH = 21.0
+LANE = '#f1f3f6'; TH = 21.0
 
 
 def lane(x, y, w, h=25.0):
@@ -96,9 +96,9 @@ y1, y2 = 36.0, 80.0
 T(BX + 3, (y1 + y2) / 2, r'$x_0$', size=8.4)
 for y in (y1, y2):
     arr([(BX + 14, (y1 + y2) / 2), (BX + 21, (y1 + y2) / 2), (BX + 21, y), (BX + 31, y)])
-XS = (BX + 31, BX + 73, BX + 127)
+XS = (BX + 31, BX + 75, BX + 136)
 for y in (y1, y2):
-    lane(BX + 26, y, XS[2] + BW_ + 17 - (BX + 26))
+    lane(BX + 26, y, XS[2] + BW_ + 17 - (BX + 26) + 44)
     for x, lab in zip(XS, (r'$j=0$', r'$j=1$', r'$j=9$')):
         block(x, y - BH_ / 2, BW_, BH_, lab, C_AE)
     arr([(XS[0] + BW_, y), (XS[1], y)])
@@ -106,7 +106,7 @@ for y in (y1, y2):
     dots(XS[1] + BW_ + 8.5, y)
     arr([(XS[2] - 8, y), (XS[2], y)])
     arr([(XS[2] + BW_, y), (XS[2] + BW_ + 12, y)])
-thumb(XS[2] + BW_ + 20, y1, 'extract/frame_0.png', 'clean'); thumb(XS[2] + BW_ + 20, y2, 'extract/frame_1.png', 'perturbed')
+T(XS[2] + BW_ + 23, y1 + 0.2, 'clean'); T(XS[2] + BW_ + 23, y2 + 0.2, 'perturbed')
 for x in XS:
     xc = x + BW_ / 2
     f.line([(xc, y1 + BH_ / 2), (xc, y2 - BH_ / 2)], color=ACC, lw=1.3, z=3.2)
@@ -118,8 +118,8 @@ Y0 = 113.0
 title(1, Y0, 'c', 'Restoration: clean reference on the same chunk, every step')
 yr, ym = Y0 + 31, Y0 + 73
 T(3, ym, r'$x_0$', size=8.4)
-XC = (30.0, 80.0, 144.0)
-lane(XC[0] - 5, yr, XC[2] + BW_ + 17 - (XC[0] - 5)); lane(XC[0] - 16, ym, XC[2] + BW_ + 17 - (XC[0] - 16))
+XC = (32.0, 88.0, 160.0)
+lane(XC[0] - 16, yr, XC[2] + BW_ + 17 - (XC[0] - 16) + 44); lane(XC[0] - 16, ym, XC[2] + BW_ + 17 - (XC[0] - 16) + 44)
 prev = 15.0
 for i, (x, lab) in enumerate(zip(XC, (r'$j=0$', r'$j=1$', r'$j=9$'))):
     block(x, ym - BH_ / 2, BW_, BH_, lab, C_AE)
@@ -134,7 +134,7 @@ for i, (x, lab) in enumerate(zip(XC, (r'$j=0$', r'$j=1$', r'$j=9$'))):
 f.line([(XC[1] + BW_, ym), (XC[1] + BW_ + 7, ym)], color=K, lw=0.9, z=3.4)
 dots(XC[1] + BW_ + 11, ym)
 arr([(XC[2] + BW_, ym), (XC[2] + BW_ + 12, ym)])
-thumb(XC[2] + BW_ + 20, yr, 'extract/frame_0.png', 'clean'); thumb(XC[2] + BW_ + 20, ym, 'extract/frame_1.png', 'perturbed')
+T(XC[2] + BW_ + 23, yr + 0.2, 'clean'); T(XC[2] + BW_ + 23, ym + 0.2, 'perturbed')
 T(XC[1] + BW_ / 2 + 5, (yr + ym) / 2 - 3.6, 'restore', size=7.0, color=ACC, weight='bold'); T(XC[1] + BW_ / 2 + 5, (yr + ym) / 2 + 4.0, 'at L9', size=7.0, color=ACC, weight='bold')
 
 # =================================================================== d: execution study
