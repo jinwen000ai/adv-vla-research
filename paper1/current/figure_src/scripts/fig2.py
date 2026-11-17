@@ -69,9 +69,10 @@ arr([(178, yc), (190, yc)])
 S_, G_ = 4.3, 0.75
 for i in range(10):
     f.box(190 + i * (S_ + G_), yc - S_ / 2, S_, S_, fc=('#f3a968' if i < 5 else '#fdebd9'), ec=K, lw=0.5, r=0.9, z=3)
+T(190 + 5 * (S_ + G_) - G_ / 2, yc - 9.5, 'action chunk', size=7.0, ha='center')
 xm = 190 + 2.5 * (S_ + G_) - G_ / 2
 arr([(xm, yc + 4.2), (xm, yc + 36), (21, yc + 36), (21, yc + 20.6)])
-T(111, yc + 43, 'first 5 commands executed, then a new observation', size=7.0, ha='center')
+T(111, yc + 43, 'first 5 actions executed, then a new observation', size=7.0, ha='center')
 
 # =================================================================== b: recording
 BX = 256.0
@@ -98,7 +99,7 @@ T(XS[1] + BW_ / 2 + 6, (y1 + y2) / 2 + 0.2, r'$\Delta H_{\ell,j}$', size=8.4)
 
 # =================================================================== c: restoration
 Y0 = 113.0
-title(1, Y0, 'c', 'Restoration: clean reference on the same plan, every step')
+title(1, Y0, 'c', 'Restoration: clean reference on the same chunk, every step')
 yr, ym = Y0 + 31, Y0 + 73
 T(3, ym, r'$x_0$', size=8.4)
 XC = (34.0, 92.0, 166.0)
@@ -136,23 +137,29 @@ run(-8.2, '-', lw=0.7, col='#8a8a8a')                          # the same-noise 
 f.cv.add_patch(Circle((x0, ys), 2.2, fc=K, ec='none', zorder=4))
 ya = Y0 + 80
 f.line([(x0, ya), (xe, ya)], color=K, lw=0.7, z=3)
-for frac, lab in ((0.22, '5'), (0.93, '60')):
+for frac, lab, top in ((0.22, '5', -9), (0.93, '60', -30)):   # each guide spans the fan at its own step, so the legend stays clear
     xx = x0 + frac * (xe - x0)
     f.line([(xx, ya), (xx, ya + 2.6)], color=K, lw=0.7, z=3)
-    f.line([(xx, ys - 30), (xx, ya)], color='#9a9a9a', lw=0.6, ls=(0, (1.2, 1.8)), z=2.5)
+    f.line([(xx, ys + top), (xx, ya)], color='#9a9a9a', lw=0.6, ls=(0, (1.2, 1.8)), z=2.5)
     T(xx, ya + 7.6, lab, size=7.0, ha='center')
 T(xe + 5, ya + 0.2, 'controls', size=7.0)
 bx = xe + 40
 
 
-def brace(ya_, yb_, lab):
+def brace(ya_, yb_, lab, sub):
     f.line([(bx - 3, ya_ + 1), (bx, ya_ + 1), (bx, yb_ - 1), (bx - 3, yb_ - 1)], color=K, lw=0.8, z=3.4)
-    T(bx + 4, (ya_ + yb_) / 2 + 0.2, lab, size=7.0)
+    ymid = (ya_ + yb_) / 2
+    T(bx + 4, ymid - 3.5, lab, size=7.0); T(bx + 4, ymid + 4.1, sub, size=7.0, color=SUB)
 
 
-brace(ys - 27, ys - 5, 'perturbation')
-brace(ys - 5, ys + 11, 'clean rerun')
-brace(ys + 11, ys + 31, 'perturbation')
+brace(ys - 27, ys - 5, 'perturbation', 'same noise')
+brace(ys - 5, ys + 11, 'clean rerun', 'different noise')
+brace(ys + 11, ys + 31, 'perturbation', 'same noise')
+# line styles, said once inside the panel
+lx, ly = x0 + 2, ys - 28.0
+for k, (ls, lab) in enumerate((('-', 'clean'), ((0, (3.2, 1.8)), 'perturbed'))):
+    f.line([(lx, ly + 8 * k), (lx + 13, ly + 8 * k)], color=K, lw=1.0, ls=ls, z=3.3)
+    T(lx + 16, ly + 8 * k + 0.2, lab, size=7.0, color=SUB)
 
 out = sys.argv[1] if len(sys.argv) > 1 else 'wire/fig2_new'
 f.save(out)

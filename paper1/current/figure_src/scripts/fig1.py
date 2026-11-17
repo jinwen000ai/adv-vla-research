@@ -102,13 +102,15 @@ for (gx, gw), kinds in ((GI, ['lin', 'lin', 'lin2', 'lin2']), (GT, ['txt'] * 3))
     tokens(gx + gw / 2, TY, kinds)
     arr([(gx + gw / 2, TY - 3), (gx + gw / 2, CB)])
 arr([(130.5, 87.5), (130.5, TY + 4), (GI[0], TY + 4)])
+T(GI[0] + GI[1] / 2, TY + 17.6, 'image tokens', size=7.0, color=SUB, ha='center')      # name the two prefix token groups once
+T(GT[0] + GT[1] / 2 + 4.5, TY + 17.6, 'text tokens', size=7.0, color=SUB)
 arr([(118, 183), (GT[0] + GT[1] / 2, 183), (GT[0] + GT[1] / 2, TY + 11)])
 a0, a1 = tokens(AX + AW / 2, TY, ['act'] * 5)
 arr([(AX + AW / 2, TY - 1.5), (AX + AW / 2, CB)])
-T(a1 + 5, TY + 4.3, 'Noisy actions')
+T(a1 + 5, TY + 4.3, 'Noisy chunk')
 tokens(AX + AW / 2, 1.5, ['act'] * 5)
 arr([(AX + AW / 2, 20), (AX + AW / 2, 10.2)])
-T(a1 + 5, 5.8, 'Commands')
+T(a1 + 5, 5.8, 'Action chunk')
 
 # ------------------------------------------------------------------ what this paper adds
 # three reads of the response (out of the model), and one closed loop at L9:
@@ -144,34 +146,41 @@ f.box(PX, 1.5, BW, BB - 1.5, fc='#f6f9fd', ec=ACC, lw=0.8, r=6, z=1.5)
 T(PX + 1, TT, 'b', size=9.5, weight='bold', color=INK)
 x = T(PX + 11, TT + 0.3, 'Effect of restoration', size=8.2, weight='bold', color=INK); print('b title ends at', round(x, 1), 'limit', W_PT - 0.6)
 TX0 = PX + 6.5
-AX0, AX1 = PX + 40, PX + BW - 8
+AX0, AX1 = PX + 38, PX + 72                                   # the interval column
+VX1 = PX + BW - 6.0                                           # values are right-aligned in their own column
+PERT_ERR = {'Camera': 0.409, 'Sensor': 0.209}                 # command error of the unedited perturbed run (Table 2)
 
 
-def forest(t, title, lo, hi, ticks, key, fmt):
+def forest(t, title, lo, hi, ticks, key, fmt, pct=False):
     T(TX0, t, title, size=7.6, color=INK)
     sx = lambda v: AX0 + (v - lo) / (hi - lo) * (AX1 - AX0)
-    ya = t + 48
+    RG = 19.0                                                   # row pitch
+    ya = t + 14 + 2 * RG - 3
     f.line([(AX0, ya), (AX1, ya)], color=K, lw=0.7, z=3)
     for v, lab in ticks:
         f.line([(sx(v), ya), (sx(v), ya + 2.6)], color=K, lw=0.7, z=3)
         T(sx(v), ya + 7.8, lab, size=7.0, color=K, ha='center')
-    f.line([(sx(0), t + 9), (sx(0), ya)], color='#7a7a7a', lw=0.7, ls=(0, (2, 1.6)), z=2.8)
+    f.line([(sx(0), t + 8.5), (sx(0), ya)], color='#7a7a7a', lw=0.7, ls=(0, (2, 1.6)), z=2.8)
     for k, (fam, label) in enumerate((('Camera', ('Camera',)), ('Sensor', ('Sensor', 'Noise')))):
-        r = rows[(fam, 'Unedited')]; y = t + 20 + k * 17
+        r = rows[(fam, 'Unedited')]; y = t + 19 + k * RG
         m, a, b = (float(r[c]) for c in key)
         if len(label) == 1:
             T(TX0, y + 0.2, label[0], size=7.0, color=K)
         else:                                                   # the family name on two lines: the panel is too narrow for one
-            T(TX0, y - 3.5, label[0], size=7.0, color=K); T(TX0, y + 4.1, label[1], size=7.0, color=K)
-        f.line([(sx(a), y), (sx(b), y)], color=ACC, lw=1.3, z=3.6)
-        f.cv.add_patch(Circle((sx(m), y), 2.6, fc=ACC, ec='#ffffff', lw=0.7, zorder=4))
-        f.text(sx(m), y - 6.9, fmt(m), size=7.0, color=K, ha='center', weight='bold', zorder=5,
-               bbox=dict(fc='#f6f9fd', ec='none', pad=0.5))
+            T(TX0, y - 3.6, label[0], size=7.0, color=K); T(TX0, y + 4.0, label[1], size=7.0, color=K)
+        f.line([(sx(a), y), (sx(b), y)], color=ACC, lw=1.4, z=3.6)
+        f.cv.add_patch(Circle((sx(m), y), 2.7, fc=ACC, ec='#f6f9fd', lw=0.7, zorder=4))
+        if pct:                                                 # absolute reduction, and its share of the unedited error
+            T(VX1, y - 3.6, fmt(m), size=7.0, color=K, ha='right', weight='bold')
+            T(VX1, y + 4.0, f'{100 * m / PERT_ERR[fam]:.0f}%', size=7.0, color=SUB, ha='right')
+        else:
+            T(VX1, y + 0.2, fmt(m), size=7.0, color=K, ha='right', weight='bold')
 
 
-T(TX0, 13.0, 'vs. the unedited run', size=7.0, color=SUB)
-forest(27.5, 'Command-error reduction', -0.02, 0.17, ((0, '0'), (0.1, '0.1')), ('mean_of_dots', 'ci_lo', 'ci_hi'), lambda v: f'{v:.4f}')
-forest(112.5, 'Task-success gain (pp)', -12, 14, ((-10, '−10'), (0, '0'), (10, '10')), ('succ_gain_pp', 'succ_lo', 'succ_hi'), lambda v: f'+{v:.2f}')
+T(TX0, 13.5, 'vs. the unedited run', size=7.0, color=SUB)
+forest(31.0, 'Command-error reduction', -0.02, 0.17, ((0, '0'), (0.1, '0.1')), ('mean_of_dots', 'ci_lo', 'ci_hi'), lambda v: f'{v:.4f}', pct=True)
+f.line([(TX0, 104.5), (PX + BW - 6.0, 104.5)], color='#c9d8ea', lw=0.6, z=2.5)
+forest(118.0, 'Task-success change (pp)', -12, 14, ((-10, '−10'), (0, '0'), (10, '10')), ('succ_gain_pp', 'succ_lo', 'succ_hi'), lambda v: f'+{v:.2f}')
 
 out = sys.argv[1] if len(sys.argv) > 1 else 'wire/fig1_teaser'
 f.save(out)
